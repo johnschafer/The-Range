@@ -5,7 +5,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class XRCustomGrabInteractable : XRGrabInteractable
 {
-    [SerializeField] private Animator animator;
+    [SerializeField] private SimpleShoot shootScript;
 
     protected override void Awake()
     {
@@ -15,7 +15,7 @@ public class XRCustomGrabInteractable : XRGrabInteractable
     protected override void OnActivated(ActivateEventArgs args)
     {
         base.OnActivated(args);
-        animator.SetTrigger("Fire");
+        shootScript.Fire();
     }
 
     protected override void OnDeactivated(DeactivateEventArgs args)

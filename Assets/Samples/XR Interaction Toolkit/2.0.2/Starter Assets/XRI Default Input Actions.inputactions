@@ -1071,6 +1071,17 @@
                     "action": "Turn",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "97e9e61e-1eea-4279-bd3f-ba1e3f876f0e",
+                    "path": "<XRController>{RightHand}/primary2DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

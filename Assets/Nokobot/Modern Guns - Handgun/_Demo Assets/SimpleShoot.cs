@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 [AddComponentMenu("Nokobot/Modern Guns/Simple Shoot")]
 public class SimpleShoot : MonoBehaviour
@@ -21,6 +22,14 @@ public class SimpleShoot : MonoBehaviour
     [Tooltip("Casing Ejection Speed")] [SerializeField] private float ejectPower = 150f;
 
 
+    [SerializeField] private AudioSource source;
+    [SerializeField] private AudioClip fireSFX;
+    [SerializeField] private AudioClip reloadSFX;
+    [SerializeField] private AudioClip noAmmoSFX;
+    [SerializeField] private Magazine magazine;
+    [SerializeField] private XRBaseInteractor socketInteractor;
+    private bool hasSlide = true;
+
     void Start()
     {
         if (barrelLocation == null)
@@ -28,17 +37,31 @@ public class SimpleShoot : MonoBehaviour
 
         if (gunAnimator == null)
             gunAnimator = GetComponentInChildren<Animator>();
+
+        socketInteractor.selectEntered.AddListener(AddMagazine);
+        socketInteractor.selectExited.AddListener(RemoveMagazine);
+
     }
 
     public void Fire()
     {
-        gunAnimator.SetTrigger("Fire");
+        if(magazine && magazine.roundCount > 0 && hasSlide)
+        {
+            gunAnimator.SetTrigger("Fire");
+        }
+        else
+        {
+            source.PlayOneShot(noAmmoSFX);
+        }
     }
 
 
     //This function creates the bullet behavior
     void Shoot()
     {
+        magazine.roundCount--;
+        source.PlayOneShot(fireSFX);
+
         if (muzzleFlashPrefab)
         {
             //Create the muzzle flash
@@ -55,6 +78,8 @@ public class SimpleShoot : MonoBehaviour
 
         // Create a bullet and add force on it in direction of the barrel
         Instantiate(bulletPrefab, barrelLocation.position, barrelLocation.rotation).GetComponent<Rigidbody>().AddForce(barrelLocation.forward * shotPower);
+
+        // ADD HERE TO TELL IF WE HAVE EMPTIED THE MAG.
 
     }
 
@@ -75,6 +100,27 @@ public class SimpleShoot : MonoBehaviour
 
         //Destroy casing after X seconds
         Destroy(tempCasing, destroyTimer);
+    }
+
+    public void AddMagazine(SelectEnterEventArgs args)
+    {
+        magazine = args.interactableObject.transform.gameObject.GetComponent<Magazine>();
+
+        source.PlayOneShot(reloadSFX);
+
+        hasSlide = false;
+    }
+
+    public void RemoveMagazine(SelectExitEventArgs args)
+    {
+        magazine = null;
+    }
+
+    public void Slide()
+    {
+        source.PlayOneShot(reloadSFX);
+
+        hasSlide = true;
     }
 
 }
